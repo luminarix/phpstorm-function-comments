@@ -1,21 +1,15 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.xheaven.phpstormfunctioncomments</id>
-    <name>phpstorm-function-comments</name>
-    <vendor>xheaven</vendor>
+    <name>Function Comments</name>
+    <vendor url="https://github.com/luminarix">Luminarix Labs</vendor>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
-
-    <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.xheaven.phpstormfunctioncomments.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.github.xheaven.phpstormfunctioncomments.startup.MyProjectActivity" />
-    </extensions>
-
     <actions>
-        <group id="functioncomments.FunctionCommentActions" text="Function Comments" description="Comment out entire PHP functions">
+        <group id="functioncomments.FunctionCommentActions" text="Function Comments"
+               description="Comment out entire PHP functions">
             <action id="functioncomments.CommentFunctionSingleLine"
                     class="com.github.xheaven.phpstormfunctioncomments.actions.SingleLineCommentFunctionAction"
                     text="Comment Function (Single-Line)"

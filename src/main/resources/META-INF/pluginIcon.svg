@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+    <defs>
+        <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#6B5CE7"/>
+            <stop offset="100%" stop-color="#8B7CF7"/>
+        </linearGradient>
+        <linearGradient id="fnGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFD43B"/>
+            <stop offset="100%" stop-color="#FFA94D"/>
+        </linearGradient>
+    </defs>
+
+    <rect x="4" y="4" width="72" height="72" rx="14" fill="url(#bgGrad)"/>
+    <rect x="4" y="4" width="72" height="72" rx="14" fill="none" stroke="#fff" stroke-opacity="0.2"/>
+
+    <!-- Left brace -->
+    <text x="20" y="40" font-family="JetBrains Mono, Consolas, monospace"
+          font-size="38" font-weight="700" fill="url(#fnGrad)"
+          text-anchor="middle" dominant-baseline="middle">{</text>
+
+    <!-- Right brace -->
+    <text x="60" y="40" font-family="JetBrains Mono, Consolas, monospace"
+          font-size="38" font-weight="700" fill="url(#fnGrad)"
+          text-anchor="middle" dominant-baseline="middle">}</text>
+
+    <!-- fn text -->
+    <text x="40" y="40" font-family="JetBrains Mono, Consolas, monospace"
+          font-size="16" font-weight="700" fill="#fff"
+          text-anchor="middle" dominant-baseline="middle">fn</text>
+</svg>
