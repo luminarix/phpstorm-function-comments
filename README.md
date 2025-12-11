@@ -1,8 +1,8 @@
 # Function Comments
 
 ![Build](https://github.com/luminarix/phpstorm-function-comments/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
+[![Version](https://img.shields.io/jetbrains/plugin/v/29338.svg)](https://plugins.jetbrains.com/plugin/29338)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/29338.svg)](https://plugins.jetbrains.com/plugin/29338)
 
 <!-- Plugin description -->
 A PhpStorm plugin that lets you quickly comment or uncomment entire PHP functions with a single keyboard shortcut.
