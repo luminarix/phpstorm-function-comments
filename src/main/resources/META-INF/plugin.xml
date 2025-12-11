@@ -1,15 +1,34 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>org.jetbrains.plugins.template</id>
-    <name>IntelliJ Platform Plugin Template</name>
-    <vendor>JetBrains</vendor>
+    <id>com.github.xheaven.phpstormfunctioncomments</id>
+    <name>phpstorm-function-comments</name>
+    <vendor>xheaven</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.jetbrains.php</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="org.jetbrains.plugins.template.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="org.jetbrains.plugins.template.startup.MyProjectActivity" />
+        <toolWindow factoryClass="com.github.xheaven.phpstormfunctioncomments.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <postStartupActivity implementation="com.github.xheaven.phpstormfunctioncomments.startup.MyProjectActivity" />
     </extensions>
+
+    <actions>
+        <group id="functioncomments.FunctionCommentActions" text="Function Comments" description="Comment out entire PHP functions">
+            <action id="functioncomments.CommentFunctionSingleLine"
+                    class="com.github.xheaven.phpstormfunctioncomments.actions.SingleLineCommentFunctionAction"
+                    text="Comment Function (Single-Line)"
+                    description="Comment out the entire function using single-line comments">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt SLASH"/>
+            </action>
+            <action id="functioncomments.CommentFunctionMultiLine"
+                    class="com.github.xheaven.phpstormfunctioncomments.actions.MultiLineCommentFunctionAction"
+                    text="Comment Function (Multi-Line)"
+                    description="Comment out the entire function using block comment">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift SLASH"/>
+            </action>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </group>
+    </actions>
 </idea-plugin>
