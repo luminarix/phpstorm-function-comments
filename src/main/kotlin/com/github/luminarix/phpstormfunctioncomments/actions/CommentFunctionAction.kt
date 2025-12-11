@@ -18,6 +18,24 @@ import com.jetbrains.php.lang.psi.elements.Method
 
 abstract class CommentFunctionAction : AnAction() {
 
+    private companion object {
+        const val SINGLE_LINE_MARKER = "//"
+        const val SINGLE_LINE_MARKER_LEN = 2
+        const val SINGLE_LINE_PREFIX_LEN = 3
+        const val MULTI_LINE_OPEN_MARKER = "/*"
+        const val MULTI_LINE_CLOSE_MARKER = "*/"
+        const val MULTI_LINE_MARKER_LEN = 2
+
+        val FUNCTION_PATTERN = Regex(
+            "^\\s*(public|private|protected|static|final|abstract|\\s)*\\s*function\\s+\\w+\\s*\\("
+        )
+        val FUNCTION_KEYWORD_PATTERN = Regex("function\\s+\\w+\\s*\\(")
+        val VISIBILITY_FUNCTION_PATTERN = Regex("(public|private|protected|static)\\s+(static\\s+)?function\\s+")
+        val BLOCK_COMMENT_OPEN = Regex("/\\*\\s*")
+        val BLOCK_COMMENT_CLOSE = Regex("\\s*\\*/")
+        val LINE_COMMENT_PREFIX = Regex("^\\s*//\\s?", RegexOption.MULTILINE)
+    }
+
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
     override fun update(e: AnActionEvent) {
@@ -40,14 +58,14 @@ abstract class CommentFunctionAction : AnAction() {
         WriteCommandAction.runWriteCommandAction(project) {
             when {
                 function != null -> commentFunction(project, editor, function)
-                commentedFunction != null -> uncommentFunction(project, editor, commentedFunction)
+                commentedFunction != null -> uncommentFunction(editor, commentedFunction)
             }
         }
     }
 
     protected abstract fun commentFunction(project: Project, editor: Editor, function: PsiElement)
 
-    protected open fun uncommentFunction(project: Project, editor: Editor, commentedFunction: CommentedFunctionInfo) {
+    private fun uncommentFunction(editor: Editor, commentedFunction: CommentedFunctionInfo) {
         val document = editor.document
         val functionText = document.getText(TextRange(commentedFunction.startOffset, commentedFunction.endOffset))
 
@@ -153,35 +171,35 @@ abstract class CommentFunctionAction : AnAction() {
         blockEndLine: Int,
         cursorLine: Int
     ): Pair<Int, Int>? {
-        val lines = (blockStartLine..blockEndLine).map { lineNum ->
-            val text = getLineText(document, lineNum)
-            val stripped = text.trim().removePrefix("//").removePrefix(" ")
-            lineNum to stripped
-        }
-
-        val functionKeywords = mutableListOf<Int>()
-        val functionPattern =
-            Regex("^\\s*(public|private|protected|static|final|abstract|\\s)*\\s*function\\s+\\w+\\s*\\(")
-
-        for ((lineNum, content) in lines) {
-            if (functionPattern.containsMatchIn(content) || content.trim().startsWith("function ")) {
-                functionKeywords.add(lineNum)
+        val lineContents = buildMap {
+            for (lineNum in blockStartLine..blockEndLine) {
+                val text = getLineText(document, lineNum)
+                val stripped = text.trim().removePrefix(SINGLE_LINE_MARKER).removePrefix(" ")
+                put(lineNum, stripped)
             }
         }
+
+        val functionKeywords = lineContents.entries
+            .filter { (_, content) ->
+                FUNCTION_PATTERN.containsMatchIn(content) || content.trimStart().startsWith("function ")
+            }
+            .map { it.key }
+            .sorted()
 
         if (functionKeywords.isEmpty()) return null
 
         val functionEffectiveStarts = functionKeywords.map { keywordLine ->
             var effectiveStart = keywordLine
             for (lineNum in (blockStartLine until keywordLine).reversed()) {
-                val content = lines.find { it.first == lineNum }?.second ?: continue
+                val content = lineContents[lineNum] ?: continue
                 val trimmed = content.trim()
-                if (trimmed.startsWith("#[") || (trimmed.endsWith("]") && trimmed.contains("#["))) {
-                    effectiveStart = lineNum
-                } else if (trimmed.isEmpty()) {
-                    continue
-                } else {
-                    break
+                when {
+                    trimmed.startsWith("#[") || (trimmed.endsWith("]") && trimmed.contains("#[")) -> {
+                        effectiveStart = lineNum
+                    }
+
+                    trimmed.isEmpty() -> continue
+                    else -> break
                 }
             }
             effectiveStart to keywordLine
@@ -202,13 +220,25 @@ abstract class CommentFunctionAction : AnAction() {
 
         var braceDepth = 0
         var foundOpenBrace = false
-        var functionEndLine = functionKeywordLine
 
         for (lineNum in functionKeywordLine..blockEndLine) {
-            val content = lines.find { it.first == lineNum }?.second ?: continue
+            val content = lineContents[lineNum] ?: continue
+            var i = 0
+            while (i < content.length) {
+                when (val char = content[i]) {
+                    '"', '\'' -> {
+                        i++
+                        while (i < content.length) {
+                            if (content[i] == '\\' && i + 1 < content.length) {
+                                i += 2
+                            } else if (content[i] == char) {
+                                break
+                            } else {
+                                i++
+                            }
+                        }
+                    }
 
-            for (char in content) {
-                when (char) {
                     '{' -> {
                         braceDepth++
                         foundOpenBrace = true
@@ -217,15 +247,15 @@ abstract class CommentFunctionAction : AnAction() {
                     '}' -> {
                         braceDepth--
                         if (foundOpenBrace && braceDepth == 0) {
-                            functionEndLine = lineNum
-                            return Pair(startLine, functionEndLine)
+                            return startLine to lineNum
                         }
                     }
                 }
+                i++
             }
         }
 
-        return Pair(startLine, functionEndLine)
+        return startLine to functionKeywordLine
     }
 
     private fun getLineText(document: Document, line: Int): String {
@@ -236,13 +266,13 @@ abstract class CommentFunctionAction : AnAction() {
 
     private fun containsFunctionPattern(text: String): Boolean {
         val cleanedText = text
-            .replace(Regex("/\\*\\s*"), "")
-            .replace(Regex("\\s*\\*/"), "")
-            .replace(Regex("^\\s*//\\s?", RegexOption.MULTILINE), "")
+            .replace(BLOCK_COMMENT_OPEN, "")
+            .replace(BLOCK_COMMENT_CLOSE, "")
+            .replace(LINE_COMMENT_PREFIX, "")
             .trim()
 
-        return cleanedText.contains(Regex("function\\s+\\w+\\s*\\(")) ||
-                cleanedText.contains(Regex("(public|private|protected|static)\\s+(static\\s+)?function\\s+"))
+        return FUNCTION_KEYWORD_PATTERN.containsMatchIn(cleanedText) ||
+                VISIBILITY_FUNCTION_PATTERN.containsMatchIn(cleanedText)
     }
 
     protected fun getFunctionTextRange(function: PsiElement, document: Document): Pair<Int, Int> {
@@ -272,13 +302,13 @@ abstract class CommentFunctionAction : AnAction() {
         return Pair(startOffset, endOffset)
     }
 
-    protected enum class CommentStyle {
+    private enum class CommentStyle {
         NONE,
         SINGLE_LINE,
         MULTI_LINE
     }
 
-    protected data class CommentedFunctionInfo(
+    private data class CommentedFunctionInfo(
         val startOffset: Int,
         val endOffset: Int,
         val style: CommentStyle
@@ -290,37 +320,30 @@ abstract class CommentFunctionAction : AnAction() {
             val lineEndOffset = document.getLineEndOffset(line)
             val lineText = document.getText(TextRange(lineStartOffset, lineEndOffset))
 
-            val commentIndex = lineText.indexOf("//")
+            val commentIndex = lineText.indexOf(SINGLE_LINE_MARKER)
             if (commentIndex != -1) {
-                val removeEnd = if (lineText.length > commentIndex + 2 && lineText[commentIndex + 2] == ' ') {
-                    commentIndex + 3
-                } else {
-                    commentIndex + 2
-                }
+                val hasSpaceAfter = lineText.length > commentIndex + SINGLE_LINE_MARKER_LEN &&
+                        lineText[commentIndex + SINGLE_LINE_MARKER_LEN] == ' '
+                val removeEnd = commentIndex + if (hasSpaceAfter) SINGLE_LINE_PREFIX_LEN else SINGLE_LINE_MARKER_LEN
                 document.deleteString(lineStartOffset + commentIndex, lineStartOffset + removeEnd)
             }
         }
     }
 
     protected fun uncommentMultiLine(document: Document, startOffset: Int, functionText: String) {
-        val openIndex = functionText.indexOf("/*")
-        val closeIndex = functionText.lastIndexOf("*/")
+        val openIndex = functionText.indexOf(MULTI_LINE_OPEN_MARKER)
+        val closeIndex = functionText.lastIndexOf(MULTI_LINE_CLOSE_MARKER)
 
         if (openIndex == -1 || closeIndex == -1) return
 
-        val openEnd = if (functionText.length > openIndex + 2 && functionText[openIndex + 2] == ' ') {
-            openIndex + 3
-        } else {
-            openIndex + 2
-        }
+        val hasSpaceAfterOpen = functionText.length > openIndex + MULTI_LINE_MARKER_LEN &&
+                functionText[openIndex + MULTI_LINE_MARKER_LEN] == ' '
+        val openEnd = openIndex + if (hasSpaceAfterOpen) MULTI_LINE_MARKER_LEN + 1 else MULTI_LINE_MARKER_LEN
 
-        val closeStart = if (closeIndex > 0 && functionText[closeIndex - 1] == ' ') {
-            closeIndex - 1
-        } else {
-            closeIndex
-        }
+        val hasSpaceBeforeClose = closeIndex > 0 && functionText[closeIndex - 1] == ' '
+        val closeStart = if (hasSpaceBeforeClose) closeIndex - 1 else closeIndex
 
-        document.deleteString(startOffset + closeStart, startOffset + closeIndex + 2)
+        document.deleteString(startOffset + closeStart, startOffset + closeIndex + MULTI_LINE_MARKER_LEN)
         document.deleteString(startOffset + openIndex, startOffset + openEnd)
     }
 }
