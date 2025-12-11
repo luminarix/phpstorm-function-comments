@@ -1,4 +1,4 @@
-package com.github.xheaven.phpstormfunctioncomments.actions
+package com.github.luminarix.phpstormfunctioncomments.actions
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction

@@ -19,10 +19,10 @@ PhpStorm Function Comments is an IntelliJ Platform plugin targeting PhpStorm. Bu
 ./gradlew test
 
 # Run a specific test class
-./gradlew test --tests "com.github.xheaven.phpstormfunctioncomments.MyPluginTest"
+./gradlew test --tests "com.github.luminarix.phpstormfunctioncomments.MyPluginTest"
 
 # Run a specific test method
-./gradlew test --tests "com.github.xheaven.phpstormfunctioncomments.MyPluginTest.testProjectService"
+./gradlew test --tests "com.github.luminarix.phpstormfunctioncomments.MyPluginTest.testProjectService"
 
 # Verify plugin compatibility with target IDEs
 ./gradlew verifyPlugin
@@ -34,7 +34,7 @@ PhpStorm Function Comments is an IntelliJ Platform plugin targeting PhpStorm. Bu
 ## Architecture
 
 - **Platform**: IntelliJ Platform (PhpStorm), Kotlin, JVM 21
-- **Plugin ID**: `com.github.xheaven.phpstormfunctioncomments`
+- **Plugin ID**: `com.github.luminarix.phpstormfunctioncomments`
 - **Target**: PhpStorm 2025.2+ (sinceBuild: 252)
 
 ### Key Directories

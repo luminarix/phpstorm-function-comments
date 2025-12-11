@@ -1,6 +1,6 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.xheaven.phpstormfunctioncomments</id>
+    <id>com.github.luminarix.phpstormfunctioncomments</id>
     <name>Function Comments</name>
     <vendor url="https://github.com/luminarix">Luminarix Labs</vendor>
 
@@ -11,13 +11,13 @@
         <group id="functioncomments.FunctionCommentActions" text="Function Comments"
                description="Comment out entire PHP functions">
             <action id="functioncomments.CommentFunctionSingleLine"
-                    class="com.github.xheaven.phpstormfunctioncomments.actions.SingleLineCommentFunctionAction"
+                    class="com.github.luminarix.phpstormfunctioncomments.actions.SingleLineCommentFunctionAction"
                     text="Comment Function (Single-Line)"
                     description="Comment out the entire function using single-line comments">
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt SLASH"/>
             </action>
             <action id="functioncomments.CommentFunctionMultiLine"
-                    class="com.github.xheaven.phpstormfunctioncomments.actions.MultiLineCommentFunctionAction"
+                    class="com.github.luminarix.phpstormfunctioncomments.actions.MultiLineCommentFunctionAction"
                     text="Comment Function (Multi-Line)"
                     description="Comment out the entire function using block comment">
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift SLASH"/>

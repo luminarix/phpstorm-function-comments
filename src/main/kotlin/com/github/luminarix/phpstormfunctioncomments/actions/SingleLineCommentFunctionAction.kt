@@ -1,5 +1,6 @@
-package com.github.xheaven.phpstormfunctioncomments.actions
+package com.github.luminarix.phpstormfunctioncomments.actions
 
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
@@ -31,14 +32,14 @@ class SingleLineCommentFunctionAction : CommentFunctionAction() {
         }
     }
 
-    private fun commentLines(document: com.intellij.openapi.editor.Document, startLine: Int, endLine: Int) {
+    private fun commentLines(document: Document, startLine: Int, endLine: Int) {
         for (line in endLine downTo startLine) {
             val lineStartOffset = document.getLineStartOffset(line)
             document.insertString(lineStartOffset, "// ")
         }
     }
 
-    private fun uncommentLines(document: com.intellij.openapi.editor.Document, startLine: Int, endLine: Int) {
+    private fun uncommentLines(document: Document, startLine: Int, endLine: Int) {
         for (line in endLine downTo startLine) {
             val lineStartOffset = document.getLineStartOffset(line)
             val lineEndOffset = document.getLineEndOffset(line)

@@ -1,5 +1,6 @@
-package com.github.xheaven.phpstormfunctioncomments.actions
+package com.github.luminarix.phpstormfunctioncomments.actions
 
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
@@ -26,7 +27,7 @@ class MultiLineCommentFunctionAction : CommentFunctionAction() {
     }
 
     private fun commentFunctionWithBlock(
-        document: com.intellij.openapi.editor.Document,
+        document: Document,
         startOffset: Int,
         endOffset: Int
     ) {
@@ -35,7 +36,7 @@ class MultiLineCommentFunctionAction : CommentFunctionAction() {
     }
 
     private fun uncommentFunction(
-        document: com.intellij.openapi.editor.Document,
+        document: Document,
         startOffset: Int,
         endOffset: Int,
         functionText: String
