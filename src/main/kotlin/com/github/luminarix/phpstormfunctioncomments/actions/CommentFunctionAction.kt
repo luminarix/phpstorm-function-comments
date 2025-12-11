@@ -25,7 +25,7 @@ abstract class CommentFunctionAction : AnAction() {
         val psiFile = e.getData(CommonDataKeys.PSI_FILE)
 
         val isEnabled = editor != null && psiFile != null &&
-            (findEnclosingFunction(psiFile, editor) != null || findCommentedFunction(psiFile, editor) != null)
+                (findEnclosingFunction(psiFile, editor) != null || findCommentedFunction(psiFile, editor) != null)
         e.presentation.isEnabledAndVisible = isEnabled
     }
 
@@ -57,9 +57,11 @@ abstract class CommentFunctionAction : AnAction() {
                 val endLine = document.getLineNumber(commentedFunction.endOffset)
                 uncommentSingleLine(document, startLine, endLine)
             }
+
             CommentStyle.MULTI_LINE -> {
                 uncommentMultiLine(document, commentedFunction.startOffset, functionText)
             }
+
             CommentStyle.NONE -> {}
         }
     }
@@ -90,7 +92,10 @@ abstract class CommentFunctionAction : AnAction() {
 
         if (elementAtCaret != null) {
             val blockComment = PsiTreeUtil.getParentOfType(elementAtCaret, PsiComment::class.java, false)
-            if (blockComment != null && blockComment.text.trimStart().startsWith("/*") && containsFunctionPattern(blockComment.text)) {
+            if (blockComment != null && blockComment.text.trimStart().startsWith("/*") && containsFunctionPattern(
+                    blockComment.text
+                )
+            ) {
                 return CommentedFunctionInfo(
                     startOffset = blockComment.textRange.startOffset,
                     endOffset = blockComment.textRange.endOffset,
@@ -155,7 +160,8 @@ abstract class CommentFunctionAction : AnAction() {
         }
 
         val functionKeywords = mutableListOf<Int>()
-        val functionPattern = Regex("^\\s*(public|private|protected|static|final|abstract|\\s)*\\s*function\\s+\\w+\\s*\\(")
+        val functionPattern =
+            Regex("^\\s*(public|private|protected|static|final|abstract|\\s)*\\s*function\\s+\\w+\\s*\\(")
 
         for ((lineNum, content) in lines) {
             if (functionPattern.containsMatchIn(content) || content.trim().startsWith("function ")) {
@@ -207,6 +213,7 @@ abstract class CommentFunctionAction : AnAction() {
                         braceDepth++
                         foundOpenBrace = true
                     }
+
                     '}' -> {
                         braceDepth--
                         if (foundOpenBrace && braceDepth == 0) {
@@ -235,7 +242,7 @@ abstract class CommentFunctionAction : AnAction() {
             .trim()
 
         return cleanedText.contains(Regex("function\\s+\\w+\\s*\\(")) ||
-            cleanedText.contains(Regex("(public|private|protected|static)\\s+(static\\s+)?function\\s+"))
+                cleanedText.contains(Regex("(public|private|protected|static)\\s+(static\\s+)?function\\s+"))
     }
 
     protected fun getFunctionTextRange(function: PsiElement, document: Document): Pair<Int, Int> {

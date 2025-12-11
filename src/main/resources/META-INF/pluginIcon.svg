@@ -16,15 +16,18 @@
     <!-- Left brace -->
     <text x="20" y="40" font-family="JetBrains Mono, Consolas, monospace"
           font-size="38" font-weight="700" fill="url(#fnGrad)"
-          text-anchor="middle" dominant-baseline="middle">{</text>
+          text-anchor="middle" dominant-baseline="middle">{
+    </text>
 
     <!-- Right brace -->
     <text x="60" y="40" font-family="JetBrains Mono, Consolas, monospace"
           font-size="38" font-weight="700" fill="url(#fnGrad)"
-          text-anchor="middle" dominant-baseline="middle">}</text>
+          text-anchor="middle" dominant-baseline="middle">}
+    </text>
 
     <!-- fn text -->
     <text x="40" y="40" font-family="JetBrains Mono, Consolas, monospace"
           font-size="16" font-weight="700" fill="#fff"
-          text-anchor="middle" dominant-baseline="middle">fn</text>
+          text-anchor="middle" dominant-baseline="middle">fn
+    </text>
 </svg>
